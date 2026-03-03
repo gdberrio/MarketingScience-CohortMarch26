@@ -19,8 +19,8 @@ datasets.
 ### 1. Clone the repository
 
 ```bash
-git clone <repo-url> cohort-Mar26
-cd cohort-Mar26
+git clone https://github.com/gdberrio/MarketingScience-CohortMarch26.git
+cd MarketingScience-CohortMarch26
 ```
 
 ### 2. Install dependencies
