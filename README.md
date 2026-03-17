@@ -7,7 +7,7 @@ datasets.
 
 ## Prerequisites
 
-- **Python 3.14+** (pinned in `.python-version`)
+- **Python 3.11+** (pinned to 3.11 in `.python-version` — required by TensorFlow/Meridian)
 - **uv** — fast Python package and project manager
   ([install instructions](https://docs.astral.sh/uv/getting-started/installation/))
 - **R** (optional) — only needed for the GeoLift notebooks that use `rpy2`
