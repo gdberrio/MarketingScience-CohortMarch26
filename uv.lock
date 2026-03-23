@@ -497,6 +497,7 @@ dependencies = [
     { name = "seaborn" },
     { name = "shiny" },
     { name = "statsmodels" },
+    { name = "tfp-causalimpact" },
     { name = "tqdm" },
 ]
 
@@ -522,6 +523,7 @@ requires-dist = [
     { name = "seaborn", specifier = ">=0.12" },
     { name = "shiny", specifier = ">=0.6" },
     { name = "statsmodels", specifier = ">=0.14" },
+    { name = "tfp-causalimpact", specifier = ">=0.2.0" },
     { name = "tqdm", specifier = ">=4.65" },
 ]
 
@@ -3698,6 +3700,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/42/38/6060f6c7472439bb3890b9094d69d31d9f8d5da123b16c738773e70fff91/tf_keras-2.20.1.tar.gz", hash = "sha256:884be5938fb0b2b53b1583c1ae2b660ef87215377c29b5b6a77fd221b472aeaf", size = 1254487, upload-time = "2025-09-04T21:23:41.81Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/85/6b/d9a8202bfe5c9e3b078cf550bafab962aa9d6b1a1f1180f0065399d4c9b2/tf_keras-2.20.1-py3-none-any.whl", hash = "sha256:3f0e0a34d9a4c8758f24fdc1053e6e335f16ab5534c7d34f1899b8924779760c", size = 1694335, upload-time = "2025-09-04T21:23:40.153Z" },
+]
+
+[[package]]
+name = "tfp-causalimpact"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "altair" },
+    { name = "jinja2" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "tensorflow" },
+    { name = "tensorflow-probability" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/25/81/808cedbd2e8846745927841edc8681b48abc4d38f7a68905efe5d7836073/tfp-causalimpact-0.2.0.tar.gz", hash = "sha256:7745f43ae97faffc04c8a5105ba0bf323da176407d8d8f663fe4b1042a34f347", size = 79993, upload-time = "2023-05-08T20:44:10.043Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ba/49/a98ebeb9611479b7f4173dddbccf35ac7c067aa3162be354384dee7d651f/tfp_causalimpact-0.2.0-py3-none-any.whl", hash = "sha256:42bac2b858396761905560c99174097f8a6c94866891b213091214c48a2cb917", size = 37171, upload-time = "2023-05-08T20:43:48.476Z" },
 ]
 
 [[package]]

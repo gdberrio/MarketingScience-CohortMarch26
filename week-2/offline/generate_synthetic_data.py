@@ -86,9 +86,14 @@ def generate_multi_geo_data(seed: int = 42) -> pd.DataFrame:
         - A geo-specific base level
         - Seasonal patterns (sinusoidal + Q4 holiday bump)
         - Media effects with channel-specific adstock decay and saturation
+          **applied to impressions** (not spend), mirroring the real causal
+          chain: Spend → Impressions → Consumer Response → Revenue.
         - A price index (negative effect on revenue)
         - Competitor spend (negative effect on revenue)
         - Random noise
+
+    Each channel also gets a time-varying CPM (cost-per-mille) so that the
+    relationship between spend and impressions is realistic but not constant.
 
     Parameters
     ----------
@@ -99,8 +104,8 @@ def generate_multi_geo_data(seed: int = 42) -> pd.DataFrame:
     -------
     pd.DataFrame
         DataFrame with 520 rows (5 geos x 104 weeks) and columns:
-        date, geo, revenue, tv_spend, digital_spend, social_spend,
-        search_spend, display_spend, price_index, competitor_spend.
+        date, geo, revenue, {ch}_spend, {ch}_impressions, {ch}_cpm,
+        price_index, competitor_spend  (for each media channel).
     """
     rng = np.random.RandomState(seed)
 
@@ -136,13 +141,22 @@ def generate_multi_geo_data(seed: int = 42) -> pd.DataFrame:
         "display": 0.25,
     }
 
-    # Half-saturation points (in units of spend after adstock)
+    # Half-saturation points (in units of *impressions* after adstock)
     half_sat = {
-        "tv": 200,
-        "digital": 120,
-        "social": 80,
-        "search": 100,
-        "display": 60,
+        "tv": 500_000,
+        "digital": 300_000,
+        "social": 200_000,
+        "search": 250_000,
+        "display": 150_000,
+    }
+
+    # Base CPM per channel ($ per 1,000 impressions) — will vary over time
+    base_cpm = {
+        "tv": 25.0,     # TV is expensive (GRP-equivalent)
+        "digital": 8.0,
+        "social": 6.0,
+        "search": 15.0,  # search clicks are pricier
+        "display": 4.0,
     }
 
     # Revenue coefficients for saturated media (per geo-week)
@@ -198,7 +212,7 @@ def generate_multi_geo_data(seed: int = 42) -> pd.DataFrame:
             + 20 * np.sin(2 * np.pi * week_idx / 26)
         ) * scale
 
-        # ---- Adstock + saturation ----
+        # ---- Spend → Impressions via time-varying CPM ----
         spends = {
             "tv": tv_spend,
             "digital": digital_spend,
@@ -207,10 +221,27 @@ def generate_multi_geo_data(seed: int = 42) -> pd.DataFrame:
             "display": display_spend,
         }
 
+        cpms = {}
+        impressions = {}
+        for ch, spend_arr in spends.items():
+            # CPM varies with seasonality (Q4 inflation) + random walk
+            cpm_seasonal = 1 + 0.25 * np.sin(2 * np.pi * week_idx / 52) \
+                           + 0.15 * (week_idx % 52 >= 44).astype(float)
+            cpm_noise = np.exp(np.cumsum(rng.normal(0, 0.03, size=n_weeks)))
+            cpm_noise = cpm_noise / cpm_noise[0]  # start at 1.0
+            cpms[ch] = base_cpm[ch] * cpm_seasonal * cpm_noise
+            # Impressions = Spend / (CPM / 1000)
+            impressions[ch] = np.where(
+                spend_arr > 0,
+                spend_arr / (cpms[ch] / 1000),
+                0.0,
+            )
+
+        # ---- Adstock + saturation on IMPRESSIONS (not spend) ----
         adstocked = {}
         saturated = {}
-        for ch, raw in spends.items():
-            adstocked[ch] = apply_adstock(raw, adstock_theta[ch])
+        for ch in spends:
+            adstocked[ch] = apply_adstock(impressions[ch], adstock_theta[ch])
             saturated[ch] = diminishing_returns(adstocked[ch], half_sat[ch])
 
         # ---- Revenue assembly ----
@@ -239,18 +270,18 @@ def generate_multi_geo_data(seed: int = 42) -> pd.DataFrame:
         revenue = np.maximum(revenue, 0)
 
         for w in range(n_weeks):
-            rows.append({
+            row = {
                 "date": dates[w].strftime("%Y-%m-%d"),
                 "geo": geo,
                 "revenue": round(float(revenue[w]), 2),
-                "tv_spend": round(float(tv_spend[w]), 2),
-                "digital_spend": round(float(digital_spend[w]), 2),
-                "social_spend": round(float(social_spend[w]), 2),
-                "search_spend": round(float(search_spend[w]), 2),
-                "display_spend": round(float(display_spend[w]), 2),
-                "price_index": round(float(price_index[w]), 2),
-                "competitor_spend": round(float(competitor_spend[w]), 2),
-            })
+            }
+            for ch in spends:
+                row[f"{ch}_spend"] = round(float(spends[ch][w]), 2)
+                row[f"{ch}_impressions"] = round(float(impressions[ch][w]), 0)
+                row[f"{ch}_cpm"] = round(float(cpms[ch][w]), 2)
+            row["price_index"] = round(float(price_index[w]), 2)
+            row["competitor_spend"] = round(float(competitor_spend[w]), 2)
+            rows.append(row)
 
     df = pd.DataFrame(rows)
     return df

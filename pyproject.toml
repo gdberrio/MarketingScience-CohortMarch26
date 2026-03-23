@@ -25,5 +25,6 @@ dependencies = [
     "seaborn>=0.12",
     "shiny>=0.6",
     "statsmodels>=0.14",
+    "tfp-causalimpact>=0.2.0",
     "tqdm>=4.65",
 ]
