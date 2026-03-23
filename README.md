@@ -78,7 +78,7 @@ cohort-Mar26/
 │   ├── session-5/
 │   ├── session-6/
 │   └── offline/
-├── week-4/              # Experimentation, GeoLift, capstone wrap-up
+├── week-4/              # Experimentation, GeoLift, MMM calibration, capstone
 │   ├── session-7/
 │   ├── session-8/
 │   └── offline/
@@ -88,7 +88,6 @@ cohort-Mar26/
 │   ├── eda_utils.py     #   Data loading, plotting, correlations
 │   └── geo_utils.py     #   Geo-experiment helpers (import directly)
 ├── data/                # Datasets and interactive demos
-│   ├── generate_synthetic_data.py
 │   ├── adstock_shiny_app.py
 │   └── *.csv / *.xlsx
 ├── pyproject.toml       # Project metadata and dependencies (uv/pip)
@@ -130,7 +129,7 @@ from utils.geo_utils import load_geo_data
 ### Regenerate synthetic datasets
 
 ```bash
-uv run python data/generate_synthetic_data.py
+uv run python week-2/offline/generate_synthetic_data.py
 ```
 
 ### Run the interactive adstock Shiny demo
@@ -160,6 +159,7 @@ This updates `pyproject.toml` and `uv.lock` in one step.
 | Core data science   | pandas, numpy, matplotlib, seaborn, scipy, statsmodels, scikit-learn |
 | Bayesian modeling   | pymc 5.x, arviz, pytensor                        |
 | MMM frameworks      | pymc-marketing, google-meridian                   |
+| Causal inference    | tfp-causalimpact                                  |
 | Visualization       | graphviz, networkx, ipywidgets                    |
 | Jupyter             | jupyter, jupyterlab                               |
 | Interactive apps    | shiny, nest-asyncio                               |
