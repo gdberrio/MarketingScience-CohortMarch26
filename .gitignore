@@ -2,3 +2,4 @@ AGENTS.md
 CLAUDE.md
 .DS_STORE
 __pycache__/
+.claude
